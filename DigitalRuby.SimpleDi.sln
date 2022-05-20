@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32505.426
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalRuby.SimpleDi", "DigitalRuby.SimpleDi\DigitalRuby.SimpleDi.csproj", "{44EA97DB-92B2-4CAC-9F70-9E7D6C4D1C04}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalRuby.SimpleDi.Tests", "DigitalRuby.SimpleDi.Tests\DigitalRuby.SimpleDi.Tests.csproj", "{96C11AE2-3876-4D88-93B9-1A1C7AD53ECA}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{AFBEB8A2-B7B9-4808-959D-4A5D7875E306}"
+	ProjectSection(SolutionItems) = preProject
+		Readme.md = Readme.md
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{44EA97DB-92B2-4CAC-9F70-9E7D6C4D1C04}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44EA97DB-92B2-4CAC-9F70-9E7D6C4D1C04}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44EA97DB-92B2-4CAC-9F70-9E7D6C4D1C04}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44EA97DB-92B2-4CAC-9F70-9E7D6C4D1C04}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96C11AE2-3876-4D88-93B9-1A1C7AD53ECA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96C11AE2-3876-4D88-93B9-1A1C7AD53ECA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96C11AE2-3876-4D88-93B9-1A1C7AD53ECA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96C11AE2-3876-4D88-93B9-1A1C7AD53ECA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A684F250-59F0-4643-A4EF-B392D0BB76C6}
+	EndGlobalSection
+EndGlobal

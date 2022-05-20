@@ -1,0 +1,32 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<OutputType>Library</OutputType>
+		<IsPackable>true</IsPackable>
+		<Title>DigitalRuby.SimpleDi</Title>
+		<Description>Simple, declarative dependency injection and configuration without all the boilerplate</Description>
+		<Version>1.0.0</Version>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Company>Digital Ruby, LLC</Company>
+		<Copyright>(c) 2022-Present Digital Ruby, LLC</Copyright>
+		<Authors>jjxtra</Authors>
+		<Product>Simple Depedency Injection</Product>
+		<PackageProjectUrl>https://github.com/DigitalRuby/simpledi</PackageProjectUrl>
+		<PackageReadmeFile>Readme.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/DigitalRuby/simpledi</RepositoryUrl>
+		<PackageTags>di;dependency;injection;reflection;configuration;C#;.NET;easy;simple;servicecollection;webhost;hostbuilder</PackageTags>
+		<PackageReleaseNotes>Initial release</PackageReleaseNotes>
+		<PackageLicenseExpression>mit</PackageLicenseExpression>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="..\Readme.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+</Project>
