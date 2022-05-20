@@ -30,7 +30,7 @@ public sealed class BindingTests
         {
             await Task.Delay(1);
         }
-        TestInternal(host.Services);        
+        TestInternal(host.Services);
     }
 
     /// <summary>
@@ -102,7 +102,7 @@ public sealed class BindingTests
             });
         }
 
-        // test are hosted service spun up
+        // test our hosted service spun up
         {
             var hostedServices = services.GetServices<IHostedService>().ToArray();
             var hostedServiceImpl = services.GetRequiredService<HelloHostedServie>();
