@@ -19,7 +19,7 @@ host.UseSimpleDi();
 ```
 
 ## Assembly Scanning
-By default, only assemblies with names prefixed with the first part of your entry assembly name will be  included for memoroy optimization purposes. You can change this in the `AddSimpleDi` and `UseSimpleDi` by passing a regex string to match assembly names.
+By default, only assemblies with names prefixed with the first part of your entry assembly name will be  included for memory optimization purposes. You can change this in the `AddSimpleDi` and `UseSimpleDi` by passing a regex string to match assembly names.
 
 ## Implementation
 
