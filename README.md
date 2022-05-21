@@ -1,4 +1,4 @@
-<h1 style='text-align: center; font-size: 3em;'>SimpleDi</h1>
+<h1 align='center'>SimpleDi</a>
 
 ## Declarative Dependency Injection and Configuration for .NET
 
