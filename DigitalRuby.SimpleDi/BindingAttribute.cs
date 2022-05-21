@@ -12,6 +12,11 @@ public class BindingAttribute : Attribute
     public ServiceLifetime Scope { get; }
 
     /// <summary>
+    /// What to do if there is a conflict
+    /// </summary>
+    public ConflictResolution Conflict { get; }
+
+    /// <summary>
     /// The interfaces to bind or null for all interfaces
     /// </summary>
     public IReadOnlyCollection<Type>? Interfaces { get; }
@@ -49,6 +54,20 @@ public class BindingAttribute : Attribute
     public BindingAttribute(ServiceLifetime scope, params Type[]? interfaces)
     {
         Scope = scope;
+        Conflict = ConflictResolution.Add;
+        Interfaces = interfaces;
+    }
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="scope">Lifetime of this service</param>
+    /// <param name="conflict">What to do if there is a conflict of multiple implementations for an interface</param>
+    /// <param name="interfaces">The interfaces to bind, or pass null array for no interfaces</param>
+    public BindingAttribute(ServiceLifetime scope, ConflictResolution conflict, params Type[]? interfaces)
+    {
+        Scope = scope;
+        Conflict = conflict;
         Interfaces = interfaces;
     }
 
@@ -82,7 +101,21 @@ public class BindingAttribute : Attribute
                             throw new InvalidOperationException("Hosted services should always be singletons");
                         }
                     }
-                    services.Add(new ServiceDescriptor(interfaceToBind, provider => provider.GetRequiredService(type), Scope));
+                    var desc = new ServiceDescriptor(interfaceToBind, provider => provider.GetRequiredService(type), Scope);
+                    switch (Conflict)
+                    {
+                        case ConflictResolution.Add:
+                            services.Add(desc);
+                            break;
+
+                        case ConflictResolution.Replace:
+                            services.Replace(desc);
+                            break;
+
+                        case ConflictResolution.Skip:
+                            services.TryAdd(desc);
+                            break;
+                    }
                 }
             }
         }

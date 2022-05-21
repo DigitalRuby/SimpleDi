@@ -10,6 +10,7 @@ global using System.Runtime.CompilerServices;
 global using System.Text.RegularExpressions;
 
 global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace DigitalRuby.SimpleDi;
 

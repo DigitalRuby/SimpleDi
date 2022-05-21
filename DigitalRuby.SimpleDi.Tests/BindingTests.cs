@@ -30,7 +30,7 @@ public sealed class BindingTests
         {
             await Task.Delay(1);
         }
-        TestInternal(host.Services);
+        TestInternal(host.Services, false);
     }
 
     /// <summary>
@@ -44,6 +44,7 @@ public sealed class BindingTests
         builder.Configuration.AddJsonFile("Configuration.json");
         builder.Services.AddSimpleDi(builder.Configuration);
         using var host = builder.Build();
+        host.UseSimpleDi(builder.Configuration);
         var lifeTime = host.Services.GetRequiredService<IHostApplicationLifetime>();
         lifeTime.ApplicationStarted.Register(() => started = true);
         host.RunAsync().GetAwaiter();
@@ -51,11 +52,31 @@ public sealed class BindingTests
         {
             await Task.Delay(1);
         }
-        TestInternal(host.Services);
+        TestInternal(host.Services, true);
     }
 
-    private static void TestInternal(IServiceProvider services)
+    private static void TestInternal(IServiceProvider services, bool isWebApp)
     {
+        // service/web setup constructor works
+        {
+            var serviceSetup = ServiceSetup.Instance;
+            ServiceSetup.Instance = null;
+            var webAppSetup = WebAppSetup.Instance;
+            WebAppSetup.Instance = null;
+
+            Assert.Multiple(() =>
+            {
+                Assert.That(serviceSetup, Is.Not.Null);
+
+                // web application builder constructor works
+                if (isWebApp)
+                {
+                    Assert.That(webAppSetup, Is.Not.Null);
+                }
+            });
+        }
+
+        // simple service bindings work
         {
             var sayHello = services.GetRequiredService<Hello>();
             var sayHelloInterface = services.GetRequiredService<IHello>();

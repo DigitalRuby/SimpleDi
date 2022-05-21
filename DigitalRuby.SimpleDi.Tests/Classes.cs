@@ -117,3 +117,31 @@ public sealed class HelloHostedServie : IHostedService, IHello5
         return Task.CompletedTask;
     }
 }
+
+public class ServiceSetup : IServiceSetup
+{
+    public static ServiceSetup? Instance { get; set; }
+
+#pragma warning disable IDE0051 // Remove unused private members
+    private ServiceSetup(IServiceCollection services, IConfiguration configuration)
+#pragma warning restore IDE0051 // Remove unused private members
+    {
+        Instance = this;
+        _ = services;
+        _ = configuration;
+    }
+}
+
+public class WebAppSetup : IWebAppSetup
+{
+    public static WebAppSetup? Instance { get; set; }
+
+#pragma warning disable IDE0051 // Remove unused private members
+    private WebAppSetup(IApplicationBuilder appBuilder, IConfiguration configuration)
+#pragma warning restore IDE0051 // Remove unused private members
+    {
+        Instance = this;
+        _ = appBuilder;
+        _ = configuration;
+    }
+}
