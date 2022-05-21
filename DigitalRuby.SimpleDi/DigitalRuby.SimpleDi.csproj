@@ -16,7 +16,7 @@
 		<Product>Simple Depedency Injection</Product>
 		<PackageProjectUrl>https://github.com/DigitalRuby/SimpleDi</PackageProjectUrl>
 		<PackageReadmeFile>Readme.md</PackageReadmeFile>
-		<RepositoryUrl>https://github.com/DigitalRuby/simpledi</RepositoryUrl>
+		<RepositoryUrl>https://github.com/DigitalRuby/SimpleDi</RepositoryUrl>
 		<PackageTags>di;dependency;injection;reflection;configuration;C#;.NET;easy;simple;servicecollection;webhost;hostbuilder</PackageTags>
 		<PackageReleaseNotes>Initial release</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
