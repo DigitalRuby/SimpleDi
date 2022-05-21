@@ -1,18 +1,23 @@
-# SimpleDi
+<h1 style='text-align: center; font-size: 3em;'>SimpleDi</h1>
+
 ## Declarative Dependency Injection and Configuration for .NET
 
 SimpleDi allows you to inject interfaces and types using attributes. No need for complex frameworks or manually adding injections to your startup code.
 
 You can also put service configuration and web application builder setup code in classes, allowing your class libraries to automatically be part of these processes.
 
-## Setup:
+## Setup
 ```cs
 using DigitalRuby.SimpleDi;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSimpleDi();
+
+// for web apps (not needed for non-web apps):
+var host = builder.Build();
+host.UseSimpleDi();
 ```
-## Implementation:
+## Implementation
 
 Create a class, `MyInterfaceImplementation`
 ```cs
@@ -88,7 +93,7 @@ public enum ConflictResolution
 }
 ```
 
-## Configuration:
+## Configuration
 
 Given a json file in your project `config.json` (set as content and copy newer in properties):
 ```json
@@ -160,3 +165,5 @@ internal class AppSetup : IWebAppSetup
 Thank you for visiting!
 
 -- Jeff
+
+https://www.digitalruby.com
