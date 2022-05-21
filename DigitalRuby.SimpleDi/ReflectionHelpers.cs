@@ -205,9 +205,9 @@ public static class ReflectionHelpers
         int dot = namespaceFilter.IndexOf('.');
         if (dot >= 0)
         {
-            namespaceFilter = namespaceFilter[..dot].Replace(".", "\\.");
+			namespaceFilter = namespaceFilter[..dot];
         }
-        return namespaceFilter;
+        return "^" + namespaceFilter.Replace(".", "\\.");
     }
 
 	private static IReadOnlyCollection<Assembly> GetAssemblies(string? namespaceFilterRegex)
