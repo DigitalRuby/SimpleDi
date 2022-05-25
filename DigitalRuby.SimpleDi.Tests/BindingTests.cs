@@ -20,7 +20,9 @@ public sealed class BindingTests
         });
         builder.ConfigureServices((context, services) =>
         {
+            Assert.That(services.SimpleDiAdded(), Is.False);
             services.AddSimpleDi(context.Configuration, "digitalruby");
+            Assert.That(services.SimpleDiAdded(), Is.True);
         });
         using var host = builder.Build();
         var lifeTime = host.Services.GetRequiredService<IHostApplicationLifetime>();
@@ -42,7 +44,9 @@ public sealed class BindingTests
         var started = false;
         var builder = WebApplication.CreateBuilder(new[] { "--urls", "http://localhost:54269" });
         builder.Configuration.AddJsonFile("Configuration.json");
+        Assert.That(builder.Services.SimpleDiAdded(), Is.False);
         builder.Services.AddSimpleDi(builder.Configuration, "digitalruby");
+        Assert.That(builder.Services.SimpleDiAdded(), Is.True);
         using var host = builder.Build();
         host.UseSimpleDi(builder.Configuration);
         var lifeTime = host.Services.GetRequiredService<IHostApplicationLifetime>();

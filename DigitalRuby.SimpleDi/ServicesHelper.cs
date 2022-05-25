@@ -6,6 +6,11 @@
 public static class ServicesHelper
 {
     /// <summary>
+    /// Ensures that we don't double-call any UseSimpleDi types
+    /// </summary>
+    private static readonly ConcurrentBag<Type> typesCalledInUseSimpleDi = new();
+
+    /// <summary>
     /// Sole purpose is to clear cache of binding attribute to avoid wasted memory usage
     /// </summary>
     private class BindingAttributeClearService : BackgroundService
@@ -14,6 +19,7 @@ public static class ServicesHelper
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             BindingAttribute.Clear();
+            ServicesHelper.typesCalledInUseSimpleDi.Clear();
             return Task.CompletedTask;
         }
     }
@@ -22,7 +28,9 @@ public static class ServicesHelper
     /// Setup simple di services. This does the following:<br/>
     /// - Register any class with dependency injection annotated with <see cref="DigitalRuby.SimpleDi.BindingAttribute" /> or <see cref="DigitalRuby.SimpleDi.ConfigurationAttribute" />.<br/>
     /// - Bind any class to configuration that is annotated with <see cref="DigitalRuby.SimpleDi.ConfigurationAttribute"/>.<br/>
-    /// - Construct any class implementing <see cref="DigitalRuby.SimpleDi.IServiceSetup"/>.
+    /// - Construct any class implementing <see cref="DigitalRuby.SimpleDi.IServiceSetup"/>.<br/>
+    /// <br/>
+    /// This method can be safely called multiple times without bad side effects.<br/>
     /// </summary>
     /// <param name="services">Services</param>
     /// <param name="configuration">Configuration</param>
@@ -39,8 +47,20 @@ public static class ServicesHelper
     }
 
     /// <summary>
+    /// Check if AddSimpleDi has already been called
+    /// </summary>
+    /// <param name="services"></param>
+    /// <returns>True if AddSimpleDi has already been called, false if not</returns>
+    public static bool SimpleDiAdded(this IServiceCollection services)
+    {
+        return services.Any(s => s.ImplementationType == typeof(BindingAttributeClearService));
+    }
+
+    /// <summary>
     /// Setup simple di web application builder. This does the following:<br/>
-    /// - Construct any class imnplementing <see cref="DigitalRuby.SimpleDi.IWebAppSetup"/>.
+    /// - Construct any class imnplementing <see cref="DigitalRuby.SimpleDi.IWebAppSetup"/>.<br/>
+    /// <br/>
+    /// This method can be safely called multiple times without bad side effects.<br/>
     /// </summary>
     /// <param name="appBuilder"></param>
     /// <param name="configuration"></param>
@@ -211,6 +231,11 @@ public static class ServicesHelper
         var interfaceType = typeof(IWebAppSetup);
         foreach (var type in ReflectionHelpers.GetAllTypes(namespaceFilterRegex))
         {
+            if (typesCalledInUseSimpleDi.Contains(type))
+            {
+                continue;
+            }
+            typesCalledInUseSimpleDi.Add(type);
             if (type.GetInterfaces().Contains(interfaceType))
             {
                 var constructors = type.GetConstructors(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
