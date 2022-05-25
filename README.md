@@ -11,18 +11,20 @@ You can also put service configuration and web application builder setup code in
 using DigitalRuby.SimpleDi;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSimpleDi();
+builder.Services.AddSimpleDi(builder.Configuration);
 
 // for web apps (not needed for non-web apps):
 var host = builder.Build();
-host.UseSimpleDi();
+host.UseSimpleDi(builder.Configuration);
 ```
 
 ## Assembly Scanning
 By default, only assemblies with names prefixed with the first part of your entry assembly name will be  included for memory optimization purposes. You can change this in the `AddSimpleDi` and `UseSimpleDi` by passing a regex string to match assembly names.
 
 ```cs
-host.UseSimpleDi("assembly1|assembly2");
+builder.Services.AddSimpleDi(builder.Configuration, "assembly1|assembly2");
+var host = builder.Build();
+host.UseSimpleDi(host.Configuration, "assembly1|assembly2");
 ```
 
 ## Implementation

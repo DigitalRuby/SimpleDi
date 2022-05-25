@@ -48,7 +48,7 @@ public sealed class BindingTests
         builder.Services.AddSimpleDi(builder.Configuration, "digitalruby");
         Assert.That(builder.Services.SimpleDiAdded(), Is.True);
         using var host = builder.Build();
-        host.UseSimpleDi(builder.Configuration);
+        host.UseSimpleDi(host.Configuration);
         var lifeTime = host.Services.GetRequiredService<IHostApplicationLifetime>();
         lifeTime.ApplicationStarted.Register(() => started = true);
         host.RunAsync().GetAwaiter();
