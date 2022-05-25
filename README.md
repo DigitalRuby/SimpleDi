@@ -97,6 +97,57 @@ public enum ConflictResolution
 }
 ```
 
+## Conflict Resolution
+
+In a complex codebase, sometimes multiple implementations will try to register for the same interface. You can control the behavior as follows:
+
+```cs
+// will always add the class as an implementation regardless of other bindings
+[Binding(BindingType.Singleton, ConflictResolution.Add)]
+public sealed class MyClass1 : IInterface1
+{
+}
+
+// will always replace the other class as an implementation regardless of other bindings
+[Binding(BindingType.Singleton, ConflictResolution.Replace)]
+public sealed class MyClass2 : IInterface1
+{
+}
+
+// if an implementatino for interface is already registered, does nothing, otherwise add the class as an implementation of the interface
+[Binding(BindingType.Singleton, ConflictResolution.Skip)]
+public sealed class MyClass3 : IInterface1
+{
+}
+```
+
+Conflict resolution has three possible values:
+
+```cs
+/// <summary>
+/// What to do if there is a conflict when registering services
+/// </summary>
+public enum ConflictResolution
+{
+    /// <summary>
+    /// Add. This will result in multiple services for an interface if more than one are added.
+    /// </summary>
+    Add = 0,
+
+    /// <summary>
+    /// Replace. This will make sure only one implementation exists for an interface.
+    /// </summary>
+    Replace,
+
+    /// <summary>
+    /// Skip. Do not register this service if another implementation exits for the interface.
+    /// </summary>
+    Skip
+}
+```
+
+If you need access to multiple bindings in a constructor, use `System.Collections.Generic.IEnumerable<T>`, where `T` is your interface.
+
 ## Configuration
 
 Given a json file in your project `config.json` (set as content and copy newer in properties):
