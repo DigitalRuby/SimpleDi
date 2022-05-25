@@ -162,13 +162,21 @@ public static class ServicesHelper
         string? namespaceFilterRegex = null)
     {
         Type attributeType = typeof(BindingAttribute);
-        foreach (var type in ReflectionHelpers.GetAllTypes(namespaceFilterRegex))
-        {
-            var attr = type.GetCustomAttributes(attributeType, true);
-            if (attr is not null && attr.Length != 0)
+
+        var allTypes = ReflectionHelpers.GetAllTypes(namespaceFilterRegex)
+            .Select(t => new
             {
-                ((BindingAttribute)attr[0]).BindServiceOfType(services, type);
-            }
+                Type = t,
+                Attribute = t.GetCustomAttributes(attributeType, true)
+                    ?.Where(a => a is BindingAttribute).FirstOrDefault() as BindingAttribute
+            })
+            .Where(t => t.Attribute is not null)
+            .OrderBy(t => t.Attribute!.Conflict)
+            .ToArray();
+
+        foreach (var type in allTypes)
+        {
+            type.Attribute!.BindServiceOfType(services, type.Type);
         }
     }
 

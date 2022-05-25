@@ -13,15 +13,15 @@ public enum ConflictResolution
     /// <summary>
     /// Replace. This will make sure only one implementation exists for an interface.
     /// </summary>
-    Replace,
+    Replace = 1,
 
     /// <summary>
     /// Skip. Do not register this service if another implementation exits for the interface.
     /// </summary>
-    Skip,
+    Skip = 2,
 
     /// <summary>
     /// Throw an exception if another class is registered for the interface.
     /// </summary>
-    Error
+    Error = 3
 }
