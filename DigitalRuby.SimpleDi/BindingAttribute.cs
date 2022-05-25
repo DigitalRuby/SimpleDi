@@ -6,6 +6,8 @@
 [AttributeUsage(AttributeTargets.Class)]
 public class BindingAttribute : Attribute
 {
+    private static readonly ConcurrentDictionary<object, Type> factories = new();
+
     /// <summary>
     /// Service scope
     /// </summary>
@@ -50,7 +52,7 @@ public class BindingAttribute : Attribute
     /// Constructor
     /// </summary>
     /// <param name="scope">Lifetime of this service</param>
-    /// <param name="interfaces">The interfaces to bind, or pass null array for no interfaces</param>
+    /// <param name="interfaces">The interfaces to bind, or pass null array for no interfaces, empty array for all interfaces</param>
     public BindingAttribute(ServiceLifetime scope, params Type[]? interfaces)
     {
         Scope = scope;
@@ -63,7 +65,7 @@ public class BindingAttribute : Attribute
     /// </summary>
     /// <param name="scope">Lifetime of this service</param>
     /// <param name="conflict">What to do if there is a conflict of multiple implementations for an interface</param>
-    /// <param name="interfaces">The interfaces to bind, or pass null array for no interfaces</param>
+    /// <param name="interfaces">The interfaces to bind, or pass null array for no interfaces, empty array for all interfaces</param>
     public BindingAttribute(ServiceLifetime scope, ConflictResolution conflict, params Type[]? interfaces)
     {
         Scope = scope;
@@ -76,6 +78,7 @@ public class BindingAttribute : Attribute
     /// </summary>
     /// <param name="services">Services</param>
     /// <param name="type">Type of service</param>
+    /// <exception cref="System.InvalidOperationException">Hosted service that is not a singleton or a conflict resolution of Error and a binding already exists</exception>
     public void BindServiceOfType(IServiceCollection services, Type type)
     {
         if (type.IsAbstract ||
@@ -84,10 +87,7 @@ public class BindingAttribute : Attribute
             return;
         }
 
-        // register the concrete type
-        services.Add(new ServiceDescriptor(type, type, Scope));
-
-        if (Interfaces is not null)
+        if (Interfaces is not null && (Interfaces.Count == 0 || Interfaces.First() is not null))
         {
             var interfacesToBind = (Interfaces.Count == 0 ? type.GetInterfaces() : Interfaces);
             foreach (var interfaceToBind in interfacesToBind)
@@ -101,7 +101,11 @@ public class BindingAttribute : Attribute
                             throw new InvalidOperationException("Hosted services should always be singletons");
                         }
                     }
-                    var desc = new ServiceDescriptor(interfaceToBind, provider => provider.GetRequiredService(type), Scope);
+
+                    var factory = (IServiceProvider provider) => provider.GetRequiredService(type);
+                    factories[factory] = type;
+                    var desc = new ServiceDescriptor(interfaceToBind, factory, Scope);
+
                     switch (Conflict)
                     {
                         case ConflictResolution.Add:
@@ -115,9 +119,43 @@ public class BindingAttribute : Attribute
                         case ConflictResolution.Skip:
                             services.TryAdd(desc);
                             break;
+
+                        case ConflictResolution.Error:
+                            var existing = services.FirstOrDefault(s => s.ServiceType == interfaceToBind);
+                            if (existing is not null)
+                            {
+                                var impType = existing.ImplementationType?.FullName ?? existing.ImplementationInstance?.GetType().FullName;
+                                if (string.IsNullOrWhiteSpace(impType) && existing.ImplementationFactory is not null)
+                                {
+                                    if (factories.TryGetValue(existing.ImplementationFactory, out Type? foundTypeFactory))
+                                    {
+                                        impType = foundTypeFactory.FullName;
+                                    }
+                                    else
+                                    {
+                                        impType = "unknown";
+                                    }
+                                }
+
+                                var errorMessage = $"Concrete type {impType} is already bound to {interfaceToBind.FullName}, {type.FullName} cannot be bound";
+                                throw new InvalidOperationException(errorMessage);
+                            }
+                            services.Add(desc);
+                            break;
                     }
                 }
             }
         }
+
+        // register the concrete type
+        services.Add(new ServiceDescriptor(type, type, Scope));
+    }
+
+    /// <summary>
+    /// Clear all caches for the binding attribute
+    /// </summary>
+    internal static void Clear()
+    {
+        factories.Clear();
     }
 }

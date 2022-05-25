@@ -28,6 +28,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DigitalRuby.SimpleDi\DigitalRuby.SimpleDi.csproj" />
+    <ProjectReference Include="..\ErrorClassLibrary\ErrorClassLibrary.csproj" />
   </ItemGroup>
 
 </Project>

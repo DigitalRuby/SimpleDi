@@ -18,5 +18,10 @@ public enum ConflictResolution
     /// <summary>
     /// Skip. Do not register this service if another implementation exits for the interface.
     /// </summary>
-    Skip
+    Skip,
+
+    /// <summary>
+    /// Throw an exception if another class is registered for the interface.
+    /// </summary>
+    Error
 }

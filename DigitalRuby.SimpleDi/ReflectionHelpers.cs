@@ -213,7 +213,8 @@ public static class ReflectionHelpers
 	private static IReadOnlyCollection<Assembly> GetAssemblies(string? namespaceFilterRegex)
 	{
 		namespaceFilterRegex ??= GetDefaultNamespaceFilter();
-		return GetAllAssemblies().Where(a =>
+		var allAssemblies = GetAllAssemblies();
+		return allAssemblies.Where(a =>
 
 			// no filter, grab the types
 			string.IsNullOrWhiteSpace(namespaceFilterRegex) ||
@@ -234,7 +235,8 @@ public static class ReflectionHelpers
 	{
 		namespaceFilterRegex ??= GetDefaultNamespaceFilter();
 		var allTypesList = new List<Type>();
-		foreach (Assembly a in GetAssemblies(namespaceFilterRegex))
+		var matchedAssemblies = GetAssemblies(namespaceFilterRegex);
+		foreach (Assembly a in matchedAssemblies)
 		{
 			try
 			{

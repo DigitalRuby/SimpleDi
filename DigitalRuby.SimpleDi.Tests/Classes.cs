@@ -91,6 +91,14 @@ public sealed class HelloOneInterface : IHello3, IHello4
 }
 
 /// <summary>
+/// Test conflict resolution of type error
+/// </summary>
+[Binding(ServiceLifetime.Singleton)]
+public sealed class ErrorImplementation : ErrorClassLibrary.IErrorInterface
+{
+}
+
+/// <summary>
 /// Sample hosted service
 /// </summary>
 [Binding(ServiceLifetime.Singleton)]

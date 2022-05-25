@@ -20,7 +20,7 @@ public sealed class BindingTests
         });
         builder.ConfigureServices((context, services) =>
         {
-            services.AddSimpleDi(context.Configuration);
+            services.AddSimpleDi(context.Configuration, "digitalruby");
         });
         using var host = builder.Build();
         var lifeTime = host.Services.GetRequiredService<IHostApplicationLifetime>();
@@ -42,7 +42,7 @@ public sealed class BindingTests
         var started = false;
         var builder = WebApplication.CreateBuilder(new[] { "--urls", "http://localhost:54269" });
         builder.Configuration.AddJsonFile("Configuration.json");
-        builder.Services.AddSimpleDi(builder.Configuration);
+        builder.Services.AddSimpleDi(builder.Configuration, "digitalruby");
         using var host = builder.Build();
         host.UseSimpleDi(builder.Configuration);
         var lifeTime = host.Services.GetRequiredService<IHostApplicationLifetime>();
@@ -53,6 +53,23 @@ public sealed class BindingTests
             await Task.Delay(1);
         }
         TestInternal(host.Services, true);
+    }
+    
+    /// <summary>
+    /// Test that we throw an exception if conflict resolution error
+    /// </summary>
+    [Test]
+    public void TestConflictResolutionError()
+    {
+        var builder = Host.CreateDefaultBuilder();
+        builder.ConfigureServices((context, services) =>
+        {
+            services.AddSimpleDi(context.Configuration);
+        });
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            builder.Build();
+        });
     }
 
     private static void TestInternal(IServiceProvider services, bool isWebApp)

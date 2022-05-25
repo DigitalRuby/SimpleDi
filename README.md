@@ -2,7 +2,7 @@
 
 ## Declarative Dependency Injection and Configuration for .NET
 
-SimpleDi allows you to inject interfaces and types using attributes. No need for complex frameworks or manually adding injections to your startup code.
+SimpleDi allows you to inject interfaces, types and configuration using attributes. No need for complex frameworks or manually adding injections to your startup code.
 
 You can also put service configuration and web application builder setup code in classes, allowing your class libraries to automatically be part of these processes.
 
@@ -20,6 +20,10 @@ host.UseSimpleDi();
 
 ## Assembly Scanning
 By default, only assemblies with names prefixed with the first part of your entry assembly name will be  included for memory optimization purposes. You can change this in the `AddSimpleDi` and `UseSimpleDi` by passing a regex string to match assembly names.
+
+```cs
+host.UseSimpleDi("assembly1|assembly2");
+```
 
 ## Implementation
 
@@ -49,6 +53,8 @@ public sealed class MyClass
 ```
 ## Hosted Services
 
+Hosted services must be bound as a singleton, otherwise an exception is thrown
+
 ```cs
 [Binding(BindingType.Singleton)]
 public sealed class MyHostedClass : IHostedService
@@ -59,7 +65,7 @@ public sealed class MyHostedClass : IHostedService
 ```
 ## Select Interfaces
 ```cs
-// only register MyClass concrete type
+// only register MyClass concrete type by passing null as second argument
 [Binding(BindingType.Singleton, null)]
 public sealed class MyClass1 : IInterface1, IInterface2
 {
@@ -71,35 +77,13 @@ public sealed class MyClass2 : IInterface1, IInterface2
 {
 }
 ```
-When using the `BindingAttribute` you can specify an optional conflict resolution:
-`public BindingAttribute(ServiceLifetime scope, ConflictResolution conflict, params Type[]? interfaces)`
-
-```cs
-/// <summary>
-/// What to do if there is a conflict when registering services
-/// </summary>
-public enum ConflictResolution
-{
-    /// <summary>
-    /// Add. This will result in multiple services for an interface if more than one are added.
-    /// </summary>
-    Add = 0,
-
-    /// <summary>
-    /// Replace. This will make sure only one implementation exists for an interface.
-    /// </summary>
-    Replace,
-
-    /// <summary>
-    /// Skip. Do not register this service if another implementation exits for the interface.
-    /// </summary>
-    Skip
-}
-```
 
 ## Conflict Resolution
 
-In a complex codebase, sometimes multiple implementations will try to register for the same interface. You can control the behavior as follows:
+In a complex codebase, sometimes multiple implementations will try to register for the same interface.
+
+When using the `BindingAttribute` you can specify an optional conflict resolution:
+`public BindingAttribute(ServiceLifetime scope, ConflictResolution conflict, params Type[]? interfaces)`
 
 ```cs
 // will always add the class as an implementation regardless of other bindings
@@ -119,9 +103,15 @@ public sealed class MyClass2 : IInterface1
 public sealed class MyClass3 : IInterface1
 {
 }
+
+// throw an exception if a binding already exists for the interface
+[Binding(BindingType.Singleton, ConflictResolution.Error)]
+public sealed class MyClass4 : IInterface1
+{
+}
 ```
 
-Conflict resolution has three possible values:
+Conflict resolution has four possible values:
 
 ```cs
 /// <summary>
@@ -142,7 +132,12 @@ public enum ConflictResolution
     /// <summary>
     /// Skip. Do not register this service if another implementation exits for the interface.
     /// </summary>
-    Skip
+    Skip,
+
+    /// <summary>
+    /// Throw an exception if another class is registered for the interface.
+    /// </summary>
+    Error
 }
 ```
 
@@ -192,7 +187,7 @@ You can create multiple keys in your configuration file for each class annotated
 Instead of custom files you can also just use your `appsettings.json` file, which is added by .NET automatically.
 
 ## Service setup code
-You can create classes in your project or even class library to run service setup code. Simply inherit from `DigitalRuby.SimpleDi.IServiceSetup` and provide a private constructor:
+You can create classes in your project or even class library to run service setup code. Simply inherit from `DigitalRuby.SimpleDi.IServiceSetup` and provide a private constructor with this exact signature:
 ```cs
 internal class ServiceSetup : IServiceSetup
 {

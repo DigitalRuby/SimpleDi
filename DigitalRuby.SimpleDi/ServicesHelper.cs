@@ -6,6 +6,19 @@
 public static class ServicesHelper
 {
     /// <summary>
+    /// Sole purpose is to clear cache of binding attribute to avoid wasted memory usage
+    /// </summary>
+    private class BindingAttributeClearService : BackgroundService
+    {
+        /// <inheritdoc />
+        protected override Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            BindingAttribute.Clear();
+            return Task.CompletedTask;
+        }
+    }
+
+    /// <summary>
     /// Setup simple di services. This does the following:<br/>
     /// - Register any class with dependency injection annotated with <see cref="DigitalRuby.SimpleDi.BindingAttribute" /> or <see cref="DigitalRuby.SimpleDi.ConfigurationAttribute" />.<br/>
     /// - Bind any class to configuration that is annotated with <see cref="DigitalRuby.SimpleDi.ConfigurationAttribute"/>.<br/>
@@ -17,6 +30,10 @@ public static class ServicesHelper
     public static void AddSimpleDi(this IServiceCollection services, IConfiguration configuration, string? namespaceFilterRegex = null)
     {
         BindBindingAttributes(services, namespaceFilterRegex);
+
+        // this will clear the binding attribute cache and then immediately terminate, removing itself from the list of hosted services
+        services.AddHostedService<BindingAttributeClearService>();
+
         BindConfigurationAttributes(services, configuration, namespaceFilterRegex);
         ConstructServiceSetup(services, configuration, namespaceFilterRegex);
     }
