@@ -8,7 +8,7 @@
 		<IsPackable>true</IsPackable>
 		<Title>DigitalRuby.SimpleDi</Title>
 		<Description>Simple, declarative dependency injection and configuration using attributes - without all the boilerplate code.</Description>
-		<Version>1.0.6</Version>
+		<Version>1.0.7</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Company>Digital Ruby, LLC</Company>
 		<Copyright>(c) 2022-Present Digital Ruby, LLC</Copyright>
@@ -18,7 +18,7 @@
 		<PackageReadmeFile>Readme.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/DigitalRuby/SimpleDi</RepositoryUrl>
 		<PackageTags>di;dependency;injection;reflection;configuration;C#;.NET;easy;simple;servicecollection;webhost;hostbuilder</PackageTags>
-		<PackageReleaseNotes>Make AddSimpleDi and UseSimpleDi safe to call multiple times</PackageReleaseNotes>
+		<PackageReleaseNotes>Throw exception if configuration cannot bind</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageIcon>icon.png</PackageIcon>
 	</PropertyGroup>

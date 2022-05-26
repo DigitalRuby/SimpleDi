@@ -68,7 +68,24 @@ public sealed class BindingTests
         var builder = Host.CreateDefaultBuilder();
         builder.ConfigureServices((context, services) =>
         {
-            services.AddSimpleDi(context.Configuration);
+            services.AddSimpleDi(context.Configuration, "ErrorClassLibraryConflict");
+        });
+        Assert.Throws<InvalidOperationException>(() =>
+        {
+            builder.Build();
+        });
+    }
+
+    /// <summary>
+    /// Test that configuration error is properly thrown
+    /// </summary>
+    [Test]
+    public void TestConfigurationError()
+    {
+        var builder = Host.CreateDefaultBuilder();
+        builder.ConfigureServices((context, services) =>
+        {
+            services.AddSimpleDi(context.Configuration, "ErrorClassLibraryConfiguration");
         });
         Assert.Throws<InvalidOperationException>(() =>
         {

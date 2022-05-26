@@ -11,3 +11,11 @@ public sealed class ErrorClassLibraryClass : IErrorInterface
 {
 
 }
+
+/// <summary>
+/// Test conflict resolution of type error
+/// </summary>
+[DigitalRuby.SimpleDi.Binding(Microsoft.Extensions.DependencyInjection.ServiceLifetime.Singleton)]
+public sealed class ErrorImplementation : ErrorClassLibrary.IErrorInterface
+{
+}

@@ -85,7 +85,7 @@ public static class ServicesHelper
     }
 
     /// <summary>
-    /// Bind an object from configuration as a singleton
+    /// Bind an object from configuration as a singleton. The type must have a parameterless constructor.
     /// </summary>
     /// <param name="services">Services</param>
     /// <param name="type">Type of object to bind</param>
@@ -93,6 +93,11 @@ public static class ServicesHelper
     /// <param name="key">Key to read from configuration</param>
     public static void BindSingleton(this IServiceCollection services, Type type, IConfiguration configuration, string key)
     {
+        var section = configuration.GetSection(key);
+        if (!section.Exists())
+        {
+            throw new InvalidOperationException($"Unable to bind object of type {type.FullName} to configuration, path {key} does not exist in configuration");
+        }
         object configObj = Activator.CreateInstance(type) ?? throw new ApplicationException("Failed to create object of type " + type.FullName);
         configuration.Bind(key, configObj);
         services.AddSingleton(type, configObj);
@@ -196,12 +201,8 @@ public static class ServicesHelper
             var attr = type.GetCustomAttributes(attributeType, true);
             if (attr is not null && attr.Length != 0)
             {
-                var path = ((ConfigurationAttribute)attr[0]).ConfigPath;
-                if (path is null)
-                {
-                    path = type.FullName ?? throw new ArgumentNullException("Unable to get full name from type " + type);
-                }
-                services.BindSingleton(type, configuration, path);
+                var path = ((ConfigurationAttribute)attr[0]).ConfigPath ?? type.FullName;
+                services.BindSingleton(type, configuration, path!);
             }
         }
     }
