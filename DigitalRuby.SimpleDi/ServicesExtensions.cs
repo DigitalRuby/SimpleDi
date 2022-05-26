@@ -3,7 +3,7 @@
 /// <summary>
 /// Dependency injection helper for services
 /// </summary>
-public static class ServicesHelper
+public static class ServicesExtensions
 {
     /// <summary>
     /// Ensures that we don't double-call any UseSimpleDi types
@@ -19,7 +19,7 @@ public static class ServicesHelper
         protected override Task ExecuteAsync(CancellationToken stoppingToken)
         {
             BindingAttribute.Clear();
-            ServicesHelper.typesCalledInUseSimpleDi.Clear();
+            ServicesExtensions.typesCalledInUseSimpleDi.Clear();
             return Task.CompletedTask;
         }
     }
@@ -37,6 +37,11 @@ public static class ServicesHelper
     /// <param name="namespaceFilterRegex"></param>
     public static void AddSimpleDi(this IServiceCollection services, IConfiguration configuration, string? namespaceFilterRegex = null)
     {
+        if (services.SimpleDiAdded())
+        {
+            return;
+        }
+
         BindBindingAttributes(services, namespaceFilterRegex);
 
         // this will clear the binding attribute cache and then immediately terminate, removing itself from the list of hosted services
