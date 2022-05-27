@@ -173,6 +173,21 @@ public sealed class Configuration
     /// </summary>
     public string Value { get; set; } = string.Empty; // overriden from config
 }
+
+// instead of the default configuration path which is namespace.classname, you can override:
+[Configuration("myconfig")]
+public sealed class Configuration
+{
+    /// <summary>
+    /// Example value
+    /// </summary>
+    public string Value { get; set; } = string.Empty; // overriden from config
+}
+
+// appsettings.json for override:
+{
+  "myconfig": { Value: "test" }
+}
 ```
 
 You can inject your `Configuration` class into any constructor as normal.
