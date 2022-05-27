@@ -174,6 +174,11 @@ public sealed class Configuration
     public string Value { get; set; } = string.Empty; // overriden from config
 }
 
+// appsettings.json:
+{
+  "DigitalRuby.SimpleDi.Tests.Configuration": { Value: "test" }
+}
+
 // instead of the default configuration path which is namespace.classname, you can override:
 [Configuration("myconfig")]
 public sealed class Configuration
