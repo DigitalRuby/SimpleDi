@@ -100,7 +100,7 @@ public sealed class MyClass2 : IInterface1
 {
 }
 
-// if an implementatino for interface is already registered, does nothing, otherwise add the class as an implementation of the interface
+// if an implementation for interface is already registered, does nothing, otherwise add the class as an implementation of the interface
 [Binding(BindingType.Singleton, ConflictResolution.Skip)]
 public sealed class MyClass3 : IInterface1
 {
