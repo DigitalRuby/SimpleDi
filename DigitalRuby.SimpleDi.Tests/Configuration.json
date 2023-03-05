@@ -2,5 +2,9 @@
   "DigitalRuby.SimpleDi.Tests.Configuration":
   {
     "Value": "hellothere"
+  },
+  "DigitalRuby.SimpleDi.Tests.ConfigurationDynamic":
+  {
+    "Value": "hellotheredynamic"
   }
 }

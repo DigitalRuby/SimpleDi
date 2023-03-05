@@ -1,4 +1,6 @@
-﻿namespace DigitalRuby.SimpleDi.Tests;
+﻿using Microsoft.Extensions.Options;
+
+namespace DigitalRuby.SimpleDi.Tests;
 
 /// <summary>
 /// Binding tests
@@ -132,6 +134,9 @@ public sealed class BindingTests
         {
             var config = services.GetRequiredService<Configuration>();
             Assert.That(config.Value, Is.EqualTo("hellothere"));
+
+            var configDynamic = services.GetRequiredService<IOptionsMonitor<ConfigurationDynamic>>();
+            Assert.That(configDynamic.CurrentValue.Value, Is.EqualTo("hellotheredynamic"));
         }
 
         // does not bind interfaces when null param in attribute

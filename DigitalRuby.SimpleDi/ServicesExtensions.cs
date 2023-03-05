@@ -99,25 +99,26 @@ public static class ServicesExtensions
     /// <param name="transient">True for transient (dynamic, updatable at runtime), false for singleton (static, loaded once)</param>
     public static void BindConfiguration(this IServiceCollection services, Type type, IConfiguration configuration, string key, bool transient)
     {
+        var section = configuration.GetSection(key);
         if (transient)
         {
             // transient, dynamic config
-            services.AddTransient(type, provider =>
-            {
-                var section = configuration.GetSection(key);
-                object obj = section.Get(type);
-                return obj;
-            });
+            var name = nameof(OptionsConfigurationServiceCollectionExtensions.Configure);
+            var method = typeof(OptionsConfigurationServiceCollectionExtensions)
+                .GetMethod(name, BindingFlags.Public | BindingFlags.Static, new Type[] { typeof(IServiceCollection), typeof(IConfiguration) }) ??
+                throw new ApplicationException("Failed to find OptionsConfigurationServiceCollectionExtensions.Configure");
+            var genericMethod = method.MakeGenericMethod(type);
+            genericMethod.Invoke(null, new object[] { services, section });
         }
         else
         {
             // singleton, up front config
-            var section = configuration.GetSection(key);
             if (!section.Exists())
             {
                 throw new InvalidOperationException($"Unable to bind object of type {type.FullName} to configuration, path {key} does not exist in configuration");
             }
-            var configObj = section.Get(type);
+            object configObj = Activator.CreateInstance(type) ?? throw new ApplicationException("Failed to create object of type " + type.FullName);
+            configuration.Bind(key, configObj);
             services.AddSingleton(type, configObj);
         }
     }
