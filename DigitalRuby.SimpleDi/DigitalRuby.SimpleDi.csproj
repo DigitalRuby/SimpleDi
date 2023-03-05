@@ -9,7 +9,7 @@
 		<IsPackable>true</IsPackable>
 		<Title>DigitalRuby.SimpleDi</Title>
 		<Description>Simple, declarative dependency injection and configuration using attributes - without all the boilerplate code.</Description>
-		<Version>1.0.11</Version>
+		<Version>1.0.12</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<Company>Digital Ruby, LLC</Company>

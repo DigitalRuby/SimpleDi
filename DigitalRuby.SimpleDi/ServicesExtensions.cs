@@ -96,16 +96,30 @@ public static class ServicesExtensions
     /// <param name="type">Type of object to bind</param>
     /// <param name="configuration">Configuration</param>
     /// <param name="key">Key to read from configuration</param>
-    public static void BindSingleton(this IServiceCollection services, Type type, IConfiguration configuration, string key)
+    /// <param name="transient">True for transient (dynamic, updatable at runtime), false for singleton (static, loaded once)</param>
+    public static void BindConfiguration(this IServiceCollection services, Type type, IConfiguration configuration, string key, bool transient)
     {
-        var section = configuration.GetSection(key);
-        if (!section.Exists())
+        if (transient)
         {
-            throw new InvalidOperationException($"Unable to bind object of type {type.FullName} to configuration, path {key} does not exist in configuration");
+            // transient, dynamic config
+            services.AddTransient(type, provider =>
+            {
+                var section = configuration.GetSection(key);
+                object obj = section.Get(type);
+                return obj;
+            });
         }
-        object configObj = Activator.CreateInstance(type) ?? throw new ApplicationException("Failed to create object of type " + type.FullName);
-        configuration.Bind(key, configObj);
-        services.AddSingleton(type, configObj);
+        else
+        {
+            // singleton, up front config
+            var section = configuration.GetSection(key);
+            if (!section.Exists())
+            {
+                throw new InvalidOperationException($"Unable to bind object of type {type.FullName} to configuration, path {key} does not exist in configuration");
+            }
+            var configObj = section.Get(type);
+            services.AddSingleton(type, configObj);
+        }
     }
 
     /// <summary>
@@ -206,8 +220,9 @@ public static class ServicesExtensions
             var attr = type.GetCustomAttributes(attributeType, true);
             if (attr is not null && attr.Length != 0)
             {
-                var path = ((ConfigurationAttribute)attr[0]).ConfigPath ?? type.FullName;
-                services.BindSingleton(type, configuration, path!);
+                var configAttr = (ConfigurationAttribute)attr[0];
+                var path = configAttr.ConfigPath ?? type.FullName;
+                services.BindConfiguration(type, configuration, path!, configAttr.IsDynamic);
             }
         }
     }

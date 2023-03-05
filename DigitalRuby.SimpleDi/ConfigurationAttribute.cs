@@ -12,11 +12,18 @@ public class ConfigurationAttribute : Attribute
 	public string? ConfigPath { get; }
 
 	/// <summary>
+	/// Dynamic, can be loaded at runtime and hot reloaded
+	/// </summary>
+	public bool IsDynamic { get; }
+
+	/// <summary>
 	/// Constructor
 	/// </summary>
 	/// <param name="configPath">Config path to bind from configuration. This can be left null to use the FullName from the type this attribute annotates.</param>
-	public ConfigurationAttribute(string? configPath = null)
+	/// <param name="isDynamic">True (dynamic) can reload values at runtime, false (static) loads values once at startup.</param>
+	public ConfigurationAttribute(string? configPath = null, bool isDynamic = false)
 	{
 		ConfigPath = configPath;
+		IsDynamic = isDynamic;
 	}
 }
