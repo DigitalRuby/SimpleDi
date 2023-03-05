@@ -1,4 +1,6 @@
-﻿namespace DigitalRuby.SimpleDi;
+﻿using Microsoft.Extensions.Options;
+
+namespace DigitalRuby.SimpleDi;
 
 /// <summary>
 /// Dependency injection helper for services
@@ -109,6 +111,11 @@ public static class ServicesExtensions
                 throw new ApplicationException("Failed to find OptionsConfigurationServiceCollectionExtensions.Configure");
             var genericMethod = method.MakeGenericMethod(type);
             genericMethod.Invoke(null, new object[] { services, section });
+            var changeTokenSourceType = typeof(IOptionsChangeTokenSource<>).MakeGenericType(type);
+            var changeTokenInstanceType = typeof(ConfigurationChangeTokenSource<>).MakeGenericType(type);
+            var changeTokenInstance = Activator.CreateInstance(changeTokenInstanceType, new object[] { key, section }) ??
+                throw new ApplicationException("Failed to create instance of ConfigurationChangeTokenSource");
+            services.AddSingleton(changeTokenSourceType, changeTokenInstance);
         }
         else
         {
