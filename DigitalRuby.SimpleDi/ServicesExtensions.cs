@@ -211,21 +211,49 @@ public static class ServicesExtensions
     /// <param name="services">Service collection</param>
     /// <param name="configuration">Configuration</param>
     /// <param name="namespaceFilterRegex">Namespace filter regex to restrict to only a subset of assemblies</param>
-    private static void BindConfigurationAttributes(this IServiceCollection services,
+    /// <returns>All keys using colon (appsettings.json) syntax</returns>
+    private static IEnumerable<string> BindConfigurationAttributes(this IServiceCollection services,
         IConfiguration configuration,
         string? namespaceFilterRegex = null)
     {
+        // function to keep track of keys from singular properties and all keys from class properties
+        static void AddKeysFromType(Type type, string rootPath, ICollection<string> keys)
+        {
+            var props = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            foreach (var prop in props)
+            {
+                var currentPath = rootPath + ":" + prop.Name;
+                if (prop.PropertyType.IsClass ||
+                    prop.PropertyType.IsInterface)
+                {
+                    AddKeysFromType(prop.PropertyType, currentPath, keys);
+                }
+                else
+                {
+                    keys.Add(currentPath);
+                }
+            }
+        }
+
+        // get all config attributes
+        var keys = new HashSet<string>();
         var attributeType = typeof(ConfigurationAttribute);
         foreach (var type in ReflectionHelpers.GetAllTypes(namespaceFilterRegex))
         {
             var attr = type.GetCustomAttributes(attributeType, true);
             if (attr is not null && attr.Length != 0)
             {
+                // bind the property
                 var configAttr = (ConfigurationAttribute)attr[0];
-                var path = configAttr.ConfigPath ?? type.FullName;
+                var path = configAttr.ConfigPath ?? type.FullName!;
                 services.BindConfiguration(type, configuration, path!, configAttr.IsDynamic);
+
+                // keep track of all keys
+                AddKeysFromType(type, path, keys);
             }
         }
+
+        return keys;
     }
 
     private static void ConstructServiceSetup(this IServiceCollection services,
