@@ -35,8 +35,8 @@ public static class ServicesExtensions
     /// <param name="services">Services</param>
     /// <param name="configuration">Configuration</param>
     /// <param name="namespaceFilterRegex"></param>
-    /// <returns>All keys (in colon format like appsettings.json) from configuration attributes or null if already setup</returns>
-    public static IEnumerable<string>? AddSimpleDi(this IServiceCollection services, IConfiguration configuration, string? namespaceFilterRegex = null)
+    /// <returns>All keys and default values (in colon format like appsettings.json) from configuration attributes or null if already setup</returns>
+    public static IEnumerable<(string, object?)>? AddSimpleDi(this IServiceCollection services, IConfiguration configuration, string? namespaceFilterRegex = null)
     {
         if (services.SimpleDiAdded())
         {
@@ -48,10 +48,10 @@ public static class ServicesExtensions
         // this will clear the binding attribute cache and then immediately terminate, removing itself from the list of hosted services
         services.AddHostedService<BindingAttributeClearService>();
 
-        var configKeys = BindConfigurationAttributes(services, configuration, namespaceFilterRegex);
+        var configKeyValues = BindConfigurationAttributes(services, configuration, namespaceFilterRegex);
         ConstructServiceSetup(services, configuration, namespaceFilterRegex);
 
-        return configKeys;
+        return configKeyValues;
     }
 
     /// <summary>
@@ -214,32 +214,37 @@ public static class ServicesExtensions
     /// <param name="services">Service collection</param>
     /// <param name="configuration">Configuration</param>
     /// <param name="namespaceFilterRegex">Namespace filter regex to restrict to only a subset of assemblies</param>
-    /// <returns>All keys using colon (appsettings.json) syntax</returns>
-    private static IEnumerable<string> BindConfigurationAttributes(this IServiceCollection services,
+    /// <returns>All keys and default values using colon (appsettings.json) syntax</returns>
+    private static IEnumerable<(string, object?)> BindConfigurationAttributes(this IServiceCollection services,
         IConfiguration configuration,
         string? namespaceFilterRegex = null)
     {
+        const string errorMessageConstructor = "Configuration attribute must be applied to a class that has a default constructor. All subclass properties must also have default constructor.";
+
         // function to keep track of keys from singular properties and all keys from class properties
-        static void AddKeysFromType(Type type, string rootPath, ICollection<string> keys)
+        static void AddKeyValuesFromType(Type type, string rootPath, object? instance, SortedDictionary<string, object?> keyValues)
         {
             var props = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
             foreach (var prop in props)
             {
                 var currentPath = rootPath + ":" + prop.Name;
-                if (prop.PropertyType.IsClass ||
-                    prop.PropertyType.IsInterface)
+                if (prop.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                    .Where(p => p.SetMethod is not null).Any())
                 {
-                    AddKeysFromType(prop.PropertyType, currentPath, keys);
+                    instance = Activator.CreateInstance(prop.PropertyType) ?? throw new ApplicationException(errorMessageConstructor);
+                    AddKeyValuesFromType(prop.PropertyType, currentPath, instance, keyValues);
                 }
                 else
                 {
-                    keys.Add(currentPath);
+                    instance = Activator.CreateInstance(type) ?? throw new ApplicationException(errorMessageConstructor);
+                    var defaultValue = prop.GetValue(instance, null);
+                    keyValues[currentPath] = defaultValue;
                 }
             }
         }
 
         // get all config attributes
-        var keys = new HashSet<string>();
+        var keyValues = new SortedDictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
         var attributeType = typeof(ConfigurationAttribute);
         foreach (var type in ReflectionHelpers.GetAllTypes(namespaceFilterRegex))
         {
@@ -252,11 +257,11 @@ public static class ServicesExtensions
                 services.BindConfiguration(type, configuration, path!, configAttr.IsDynamic);
 
                 // keep track of all keys
-                AddKeysFromType(type, path, keys);
+                AddKeyValuesFromType(type, path, null, keyValues);
             }
         }
 
-        return keys;
+        return keyValues.Select(kv => (kv.Key, kv.Value));
     }
 
     private static void ConstructServiceSetup(this IServiceCollection services,
