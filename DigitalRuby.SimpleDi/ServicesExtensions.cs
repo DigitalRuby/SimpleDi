@@ -225,7 +225,7 @@ public static class ServicesExtensions
         static void AddKeyValuesFromType(Type type, string rootPath, object? instance, SortedDictionary<string, object?> keyValues)
         {
             var props = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            foreach (var prop in props)
+            foreach (var prop in props.Where(p => p.SetMethod is not null))
             {
                 var currentPath = rootPath + ":" + prop.Name;
                 if (prop.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
