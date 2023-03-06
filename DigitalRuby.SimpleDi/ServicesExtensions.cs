@@ -35,11 +35,12 @@ public static class ServicesExtensions
     /// <param name="services">Services</param>
     /// <param name="configuration">Configuration</param>
     /// <param name="namespaceFilterRegex"></param>
-    public static void AddSimpleDi(this IServiceCollection services, IConfiguration configuration, string? namespaceFilterRegex = null)
+    /// <returns>All keys (in colon format like appsettings.json) from configuration attributes or null if already setup</returns>
+    public static IEnumerable<string>? AddSimpleDi(this IServiceCollection services, IConfiguration configuration, string? namespaceFilterRegex = null)
     {
         if (services.SimpleDiAdded())
         {
-            return;
+            return null;
         }
 
         BindBindingAttributes(services, namespaceFilterRegex);
@@ -47,8 +48,10 @@ public static class ServicesExtensions
         // this will clear the binding attribute cache and then immediately terminate, removing itself from the list of hosted services
         services.AddHostedService<BindingAttributeClearService>();
 
-        BindConfigurationAttributes(services, configuration, namespaceFilterRegex);
+        var configKeys = BindConfigurationAttributes(services, configuration, namespaceFilterRegex);
         ConstructServiceSetup(services, configuration, namespaceFilterRegex);
+
+        return configKeys;
     }
 
     /// <summary>
