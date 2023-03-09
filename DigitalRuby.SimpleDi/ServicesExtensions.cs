@@ -224,12 +224,12 @@ public static class ServicesExtensions
         // function to keep track of keys from singular properties and all keys from class properties
         static void AddKeyValuesFromType(Type type, string rootPath, object? instance, SortedDictionary<string, object?> keyValues)
         {
-            var props = type.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            foreach (var prop in props.Where(p => p.SetMethod is not null))
+            var props = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
+            foreach (var prop in props.Where(p => p.SetMethod is not null && p.SetMethod.IsPublic))
             {
                 var currentPath = rootPath + ":" + prop.Name;
                 if (prop.PropertyType.GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                    .Where(p => p.SetMethod is not null).Any())
+                    .Where(p => p.SetMethod is not null && p.SetMethod.IsPublic).Any())
                 {
                     instance = Activator.CreateInstance(prop.PropertyType) ?? throw new ApplicationException(errorMessageConstructor);
                     AddKeyValuesFromType(prop.PropertyType, currentPath, instance, keyValues);
