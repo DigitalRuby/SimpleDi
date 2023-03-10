@@ -1,4 +1,8 @@
-﻿namespace DigitalRuby.SimpleDi;
+﻿using Microsoft.Extensions.Configuration;
+
+using System.ComponentModel.DataAnnotations;
+
+namespace DigitalRuby.SimpleDi;
 
 /// <summary>
 /// Delegate for object activator
@@ -189,6 +193,73 @@ public static class ReflectionHelpers
 
 		return allAssemblies = allAssembliesHashSet;
 	}
+
+	private static KeyValuePair<Type, ConfigurationAttribute>[]? typesAndConfigAttributes;
+    /// <summary>
+    /// Get all configuration attributes and types annotated. This call is computed only once and will never change after that,
+	/// even if the namespaceFilterRegex parameter is changed.
+    /// </summary>
+	/// <param name="namespaceFilterRegex">Namespace filter regex</param>
+    /// <returns>Types and configuration attributes</returns>
+    public static IReadOnlyCollection<KeyValuePair<Type, ConfigurationAttribute>> GetConfigurationAttributes(string? namespaceFilterRegex = null)
+	{
+		if (typesAndConfigAttributes is not null)
+		{
+			return typesAndConfigAttributes;
+		}
+
+		List<KeyValuePair<Type, ConfigurationAttribute>> results = new();
+        foreach (var type in ReflectionHelpers.GetAllTypes(namespaceFilterRegex))
+        {
+			var configAttr = type.GetCustomAttribute<ConfigurationAttribute>();
+			if (configAttr is not null)
+			{
+				// fix config path
+                configAttr.ConfigPath = (string.IsNullOrWhiteSpace(configAttr.ConfigPath) ? type.FullName! : configAttr.ConfigPath);
+
+				// add it
+				results.Add(new KeyValuePair<Type, ConfigurationAttribute>(type, configAttr));
+            }
+        }
+		return typesAndConfigAttributes = results.ToArray();
+    }
+
+	private static readonly ConcurrentDictionary<string, DisplayAttribute?> getDisplayAttributes = new();
+	/// <summary>
+	/// Get display attribute from a config path
+	/// </summary>
+	/// <param name="configPath">Config path</param>
+	/// <returns>Display attribute</returns>
+	public static DisplayAttribute? GetDisplayAttribute(string configPath)
+	{
+		return getDisplayAttributes.GetOrAdd(configPath, _configPath =>
+		{
+			var configAttr = GetConfigurationAttributes();
+			DisplayAttribute? displayAttr = null;
+			foreach (var config in configAttr)
+			{
+				if (configPath.StartsWith(config.Value.ConfigPath + ":"))
+				{
+					// we are in the right root type
+					var subConfigPath = configPath[(config.Value.ConfigPath.Length + 1)..];
+					var segments = subConfigPath.Split(':');
+					Type? currentType = config.Key;
+					PropertyInfo? prop = null;
+					foreach (var segment in segments)
+					{
+						prop = currentType?.GetProperty(segment, BindingFlags.Public | BindingFlags.Instance);
+						currentType = prop?.PropertyType;
+					}
+					if (prop is not null)
+					{
+						displayAttr = prop.GetCustomAttribute<DisplayAttribute>();
+						break;
+					}
+				}
+			}
+			return displayAttr;
+		});
+    }
 
     private static string GetDefaultNamespaceFilter()
     {

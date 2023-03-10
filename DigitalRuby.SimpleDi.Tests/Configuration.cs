@@ -1,10 +1,16 @@
-﻿namespace DigitalRuby.SimpleDi.Tests;
+﻿using System.ComponentModel.DataAnnotations;
 
+namespace DigitalRuby.SimpleDi.Tests;
+
+/// <summary>
+/// Sub class
+/// </summary>
 public sealed class SubClass
 {
     /// <summary>
     /// Value 1
     /// </summary>
+    [Display(Name = "name", Description = "desc")]
     public string Value1 { get; init; } = "1";
 
     /// <summary>

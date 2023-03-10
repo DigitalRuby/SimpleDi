@@ -245,20 +245,14 @@ public static class ServicesExtensions
 
         // get all config attributes
         var keyValues = new SortedDictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
-        var attributeType = typeof(ConfigurationAttribute);
-        foreach (var type in ReflectionHelpers.GetAllTypes(namespaceFilterRegex))
+        var configAttributes = ReflectionHelpers.GetConfigurationAttributes(namespaceFilterRegex);
+        foreach (var kv in configAttributes)
         {
-            var attr = type.GetCustomAttributes(attributeType, true);
-            if (attr is not null && attr.Length != 0)
-            {
-                // bind the property
-                var configAttr = (ConfigurationAttribute)attr[0];
-                var path = configAttr.ConfigPath ?? type.FullName!;
-                services.BindConfiguration(type, configuration, path!, configAttr.IsDynamic);
+            // bind the property
+            services.BindConfiguration(kv.Key, configuration, kv.Value.ConfigPath, kv.Value.IsDynamic);
 
-                // keep track of all keys
-                AddKeyValuesFromType(type, path, null, keyValues);
-            }
+            // keep track of all keys
+            AddKeyValuesFromType(kv.Key, kv.Value.ConfigPath, null, keyValues);
         }
 
         return keyValues.Select(kv => (kv.Key, kv.Value));

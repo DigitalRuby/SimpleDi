@@ -9,6 +9,16 @@ namespace DigitalRuby.SimpleDi.Tests;
 public sealed class BindingTests
 {
     /// <summary>
+    /// Tear down
+    /// </summary>
+    [TearDown]
+    public void Setup()
+    {
+        typeof(ReflectionHelpers).GetField("typesAndConfigAttributes",
+            System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic)!.SetValue(null, null);
+    }
+
+    /// <summary>
     /// Test that we can use binding and configuration attributes with non-web application
     /// </summary>
     [Test]
@@ -35,6 +45,7 @@ public sealed class BindingTests
             await Task.Delay(1);
         }
         TestInternal(host.Services, false);
+        TestDisplayAttribute();
     }
 
     /// <summary>
@@ -59,6 +70,7 @@ public sealed class BindingTests
             await Task.Delay(1);
         }
         TestInternal(host.Services, true);
+        TestDisplayAttribute();
     }
     
     /// <summary>
@@ -181,5 +193,17 @@ public sealed class BindingTests
                 Assert.That(registerCount, Is.EqualTo(1));
             });
         }
+    }
+
+    private static void TestDisplayAttribute()
+    {
+        var displayAttr = ReflectionHelpers.GetDisplayAttribute("DigitalRuby.SimpleDi.Tests.Configuration:Value1:Value1");
+        Assert.That(displayAttr, Is.Null);
+        displayAttr = ReflectionHelpers.GetDisplayAttribute("DigitalRuby.SimpleDi.Tests.Configuration:Value1:Value2");
+        Assert.That(displayAttr, Is.Null);
+        displayAttr = ReflectionHelpers.GetDisplayAttribute("DigitalRuby.SimpleDi.Tests.Configuration:Value2:Value1");
+        Assert.That(displayAttr, Is.Not.Null);
+        Assert.That(displayAttr.Name, Is.EqualTo("name"));
+        Assert.That(displayAttr.Description, Is.EqualTo("desc"));
     }
 }

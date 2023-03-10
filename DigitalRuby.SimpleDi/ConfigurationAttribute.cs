@@ -9,7 +9,7 @@ public class ConfigurationAttribute : Attribute
 	/// <summary>
 	/// Config path
 	/// </summary>
-	public string? ConfigPath { get; }
+	public string ConfigPath { get; internal set; }
 
 	/// <summary>
 	/// Dynamic, can be loaded at runtime and hot reloaded
@@ -19,9 +19,9 @@ public class ConfigurationAttribute : Attribute
 	/// <summary>
 	/// Constructor
 	/// </summary>
-	/// <param name="configPath">Config path to bind from configuration. This can be left null to use the FullName from the type this attribute annotates.</param>
+	/// <param name="configPath">Config path to bind from configuration. This can be left empty to use the FullName from the type this attribute annotates.</param>
 	/// <param name="isDynamic">True (dynamic) can reload values at runtime, false (static) loads values once at startup.</param>
-	public ConfigurationAttribute(string? configPath = null, bool isDynamic = false)
+	public ConfigurationAttribute(string configPath = "", bool isDynamic = false)
 	{
 		ConfigPath = configPath;
 		IsDynamic = isDynamic;
