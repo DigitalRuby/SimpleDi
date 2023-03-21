@@ -202,7 +202,7 @@ public static class ServicesExtensions
             .OrderBy(t => t.Attribute!.Conflict)
             .ToArray();
 
-        foreach (var type in allTypes)
+        foreach (var type in allTypes.OrderBy(t => t.Attribute!.Order))
         {
             type.Attribute!.BindServiceOfType(services, type.Type);
         }

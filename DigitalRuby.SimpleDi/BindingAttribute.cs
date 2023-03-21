@@ -19,6 +19,11 @@ public class BindingAttribute : Attribute
     public ConflictResolution Conflict { get; }
 
     /// <summary>
+    /// Control the order of processing, 0 is default value
+    /// </summary>
+    public int Order { get; init; }
+
+    /// <summary>
     /// The interfaces to bind or null for all interfaces
     /// </summary>
     public IReadOnlyCollection<Type>? Interfaces { get; }
