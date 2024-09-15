@@ -61,7 +61,18 @@ public static class ServicesExtensions
     /// <returns>True if AddSimpleDi has already been called, false if not</returns>
     public static bool SimpleDiAdded(this IServiceCollection services)
     {
-        return services.Any(s => s.ImplementationType == typeof(BindingAttributeClearService));
+        return services.Any(s =>
+        {
+            try
+            {
+                // apparently this can throw with keyed errors, so eat them
+                return s.ImplementationType == typeof(BindingAttributeClearService);
+            }
+            catch
+            {
+                return false;
+            }
+        });
     }
 
     /// <summary>

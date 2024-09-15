@@ -9,7 +9,7 @@
 		<IsPackable>true</IsPackable>
 		<Title>DigitalRuby.SimpleDi</Title>
 		<Description>Simple, declarative dependency injection and configuration using attributes - without all the boilerplate code.</Description>
-		<Version>2.0.0</Version>
+		<Version>2.0.1</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<Company>Digital Ruby, LLC</Company>
@@ -20,7 +20,7 @@
 		<PackageReadmeFile>Readme.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/DigitalRuby/SimpleDi</RepositoryUrl>
 		<PackageTags>di;dependency;injection;reflection;configuration;C#;.NET;easy;simple;servicecollection;webhost;hostbuilder;autofac;ninject;container;setup;register</PackageTags>
-		<PackageReleaseNotes>.NET 8</PackageReleaseNotes>
+		<PackageReleaseNotes>Fix keyed exception error on startup when using resilient http clients</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageIcon>icon.png</PackageIcon>
 	</PropertyGroup>
