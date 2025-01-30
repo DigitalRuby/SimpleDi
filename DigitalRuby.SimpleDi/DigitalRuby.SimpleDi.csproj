@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<LangVersion>latest</LangVersion>
@@ -9,7 +9,7 @@
 		<IsPackable>true</IsPackable>
 		<Title>DigitalRuby.SimpleDi</Title>
 		<Description>Simple, declarative dependency injection and configuration using attributes - without all the boilerplate code.</Description>
-		<Version>2.0.1</Version>
+		<Version>3.0.1</Version>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 		<Company>Digital Ruby, LLC</Company>
@@ -20,7 +20,7 @@
 		<PackageReadmeFile>Readme.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/DigitalRuby/SimpleDi</RepositoryUrl>
 		<PackageTags>di;dependency;injection;reflection;configuration;C#;.NET;easy;simple;servicecollection;webhost;hostbuilder;autofac;ninject;container;setup;register</PackageTags>
-		<PackageReleaseNotes>Fix keyed exception error on startup when using resilient http clients</PackageReleaseNotes>
+		<PackageReleaseNotes>.NET 9</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageIcon>icon.png</PackageIcon>
 	</PropertyGroup>
